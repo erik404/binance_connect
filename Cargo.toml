@@ -1,8 +1,14 @@
 [package]
 authors = ["Erik-Jan van de Wal"]
 name = "binance_connect"
-version = "0.1.0"
+description = "A collection of connectors for the Binance Exchange"
+version = "1.0.0"
 edition = "2021"
+repository = "https://github.com/erik404/binance_connect/"
+rust-version = "1.63.0"
+readme = "README.md"
+license-file = "LICENSE.txt"
+keywords = ["binance", "connector", "websocket", "event", "crypto"]
 
 [dependencies]
 reqwest = { version = "0.11.18", features = ["blocking"] }
