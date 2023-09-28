@@ -1,4 +1,10 @@
-Currently supports the complete USD-M Futures WebSocket streams. Other WebSocket and API implementations for the Binance Exchange are under development.
+### Roadmap
+ - ~~USD-M Futures WebSocket~~ ✅
+ - USD-M Futures Rest Api
+ - SpotMarket WebSocket
+ - SpotMarket Rest Api
+ - Coin-M Futures WebSocket
+ - Coin-M Futures Rest Api
 
 # binance_connect::futures_usd
 
