@@ -1,0 +1,30 @@
+/src/main.rs
+
+# JetBrains IDEs
+.idea/
+
+# Compiled files
+out/
+cmake-build-debug/
+cmake-build-release/
+CMakeFiles/
+CMakeCache.txt
+compile_commands.json
+CMakeScripts/
+CMakeModules/
+
+# Executables
+*.exe
+*.out
+
+# Generated files
+CMakeLists.txt.user
+*.cmake.user
+*.cxx
+*.iml
+*.iws
+.idea_modules/
+
+# Rust-specific
+/target/
+Cargo.lock
