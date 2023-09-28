@@ -1,4 +1,7 @@
+Currently supports the complete USD-M Futures WebSocket streams. Other WebSocket and API implementations for the Binance Exchange are under development.
+
 # binance_connect::futures_usd
+
 
 ## Features
 
