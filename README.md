@@ -1,4 +1,4 @@
-[![Rust](https://github.com/erik404/binance_connect/actions/workflows/rust.yml/badge.svg?branch=test)](https://github.com/erik404/binance_connect/actions/workflows/rust.yml)
+[![Rust Build & Test](https://github.com/erik404/binance_connect/actions/workflows/rust_wf.yml/badge.svg)](https://github.com/erik404/binance_connect/actions/workflows/rust_wf.yml)
 
 ### Roadmap
  - ~~USD-M Futures WebSocket~~ ✅
