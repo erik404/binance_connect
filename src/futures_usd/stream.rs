@@ -335,7 +335,8 @@ impl FuturesUsdStream {
                     )
                     .unwrap(),
                     None => panic!(
-                        "Can't start unauthenticated ws connection without at least 1 futures_usd"
+                        "{}",
+                        constants::ERR_ON_NO_ENABLED_STREAM_UNAUTHENTICATED_REQ
                     ),
                 }
             }
