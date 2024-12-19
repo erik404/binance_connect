@@ -200,9 +200,13 @@ impl FuturesUsdStream {
         self
     }
 
+    // Stops the Websocket thread and drops the sender
     pub fn stop(&self) {
+        eprint!("killing stuff");
         self.stop_signal
             .store(true, std::sync::atomic::Ordering::Relaxed);
+        let sender_clone = self.sender.clone();
+        drop(sender_clone);
     }
 
     /// Spawns a new thread for establishing a WebSocket connection.

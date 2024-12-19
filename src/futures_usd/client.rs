@@ -1,8 +1,8 @@
 use std::io::ErrorKind;
 use std::net::TcpStream;
-use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::mpsc::Sender;
+use std::sync::Arc;
 
 use log::{debug, info};
 use tungstenite::stream::MaybeTlsStream;
@@ -50,12 +50,21 @@ pub fn client(
             Ok(message) => match message {
                 // Handle incoming JSON messages.
                 Message::Text(json_response) => {
+                    // Stop signal might have been called
+                    if stop_signal.load(Ordering::Relaxed) {
+                        return Ok(());
+                    };
+
                     // Deserialize the JSON into an `Event` and send it to the sender.
                     let event: Event = deserialize(json_response)?;
                     sender.send(event)?;
                 }
                 // Handle incoming Ping messages.
                 Message::Ping(ping) => {
+                    // Stop signal might have been called
+                    if stop_signal.load(Ordering::Relaxed) {
+                        return Ok(());
+                    };
                     // Respond to Ping with Pong to keep the connection alive.
                     socket.send(Message::Pong(ping))?;
                     debug!("Pong");
@@ -64,6 +73,11 @@ pub fn client(
             },
             Err(err) => match err {
                 tungstenite::Error::Io(ref io_err) if io_err.kind() == ErrorKind::WouldBlock => {
+                    // Stop signal might have been called
+                    if stop_signal.load(Ordering::Relaxed) {
+                        return Ok(());
+                    };
+
                     if would_block_config.error_on_block {
                         // Return a SocketError if configured to do so.
                         Err(BinanceConnectError::SocketError(err))?;
@@ -76,6 +90,10 @@ pub fn client(
                     std::thread::sleep(would_block_config.time_out);
                 }
                 _ => {
+                    // Stop signal might have been called
+                    if stop_signal.load(Ordering::Relaxed) {
+                        return Ok(());
+                    };
                     // Return a SocketError for other types of errors.
                     Err(BinanceConnectError::SocketError(err))?;
                 }
