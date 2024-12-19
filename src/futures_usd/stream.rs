@@ -1,4 +1,6 @@
+use std::sync::atomic::AtomicBool;
 use std::sync::mpsc::{channel, Receiver, Sender};
+use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
 
@@ -137,6 +139,7 @@ pub struct FuturesUsdStream {
     listen_key: ListenKey,
     streams_public: Vec<Streams>,
     authenticated: bool,
+    stop_signal: Arc<AtomicBool>,
 }
 
 impl Default for FuturesUsdStream {
@@ -149,6 +152,7 @@ impl Default for FuturesUsdStream {
             listen_key: ListenKey { key: String::new() },
             streams_public: Vec::new(),
             authenticated: false,
+            stop_signal: Arc::new(AtomicBool::new(false)),
         }
     }
 }
@@ -173,6 +177,7 @@ impl FuturesUsdStream {
             listen_key: ListenKey { key: String::new() },
             streams_public: Vec::new(),
             authenticated: false,
+            stop_signal: Arc::new(AtomicBool::new(false)),
         }
     }
 
@@ -190,8 +195,14 @@ impl FuturesUsdStream {
             self.sender.clone(),
             self.config.clone(),
             self.subscribe_payload(),
+            Arc::clone(&self.stop_signal),
         );
         self
+    }
+
+    pub fn stop(&self) {
+        self.stop_signal
+            .store(true, std::sync::atomic::Ordering::Relaxed);
     }
 
     /// Spawns a new thread for establishing a WebSocket connection.
@@ -211,9 +222,10 @@ impl FuturesUsdStream {
         sender: Sender<Event>,
         config: FuturesWebSocketConfig,
         subscribe_payload: Option<String>,
+        stop_signal: Arc<AtomicBool>,
     ) {
         thread::spawn(move || {
-            Self::open_ws_con(url, sender, config, subscribe_payload);
+            Self::open_ws_con(url, sender, config, subscribe_payload, stop_signal);
         });
     }
 
@@ -235,10 +247,12 @@ impl FuturesUsdStream {
         sender: Sender<Event>,
         config: FuturesWebSocketConfig,
         subscribe_payload: Option<String>,
+        stop_signal: Arc<AtomicBool>,
     ) {
         let result: Result<(), BinanceConnectError> = client(
             sender.clone(),
             url.clone(),
+            Arc::clone(&stop_signal),
             config.would_block_config.clone(),
             subscribe_payload.clone(),
         );
@@ -246,7 +260,13 @@ impl FuturesUsdStream {
             if config.reconnect && matches!(err, BinanceConnectError::SocketError(_)) {
                 info!("Reconnecting on SocketError: {:?}", err.to_string());
                 thread::sleep(Duration::from_millis(100));
-                Self::open_ws_con(url, sender, config, subscribe_payload);
+                Self::open_ws_con(
+                    url,
+                    sender,
+                    config,
+                    subscribe_payload,
+                    Arc::clone(&stop_signal),
+                );
             } else {
                 panic!("futures_usd thread panicked {:?}", err.to_string());
             }
@@ -262,8 +282,8 @@ impl FuturesUsdStream {
     ///
     /// A `Receiver<Event>` that can be used to receive WebSocket events.
     ///
-    pub fn consume(self) -> Receiver<Event> {
-        self.receiver
+    pub fn consume(&self) -> &Receiver<Event> {
+        &self.receiver
     }
 
     /// Retrieves and manages the listen key used for WebSocket authentication.

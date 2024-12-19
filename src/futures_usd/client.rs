@@ -1,5 +1,7 @@
 use std::io::ErrorKind;
 use std::net::TcpStream;
+use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::mpsc::Sender;
 
 use log::{debug, info};
@@ -29,6 +31,7 @@ use crate::futures_usd::stream::WouldBlockConfig;
 pub fn client(
     sender: Sender<Event>,
     url: Url,
+    stop_signal: Arc<AtomicBool>,
     would_block_config: WouldBlockConfig,
     subscribe_payload: Option<String>,
 ) -> Result<(), BinanceConnectError> {
@@ -42,7 +45,7 @@ pub fn client(
     }
 
     // Continuously read and process WebSocket messages.
-    loop {
+    while !stop_signal.load(Ordering::Relaxed) {
         match socket.read() {
             Ok(message) => match message {
                 // Handle incoming JSON messages.
@@ -79,6 +82,8 @@ pub fn client(
             },
         }
     }
+
+    Ok(())
 }
 
 /// Establishes a WebSocket connection to the provided URL.

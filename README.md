@@ -30,6 +30,13 @@ Create an instance of the `FuturesUsdStream` and add the desired streams for rea
      .start();
  ```
 
+To manually close the connection thread you can call.
+
+```rust
+fus.close();
+```
+
+
 ##
 #### With config
 
