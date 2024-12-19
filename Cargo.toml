@@ -2,7 +2,7 @@
 authors = ["Erik-Jan van de Wal"]
 name = "binance_connect"
 description = "A collection of connectors for the Binance Exchange"
-version = "1.0.1"
+version = "1.0.2"
 edition = "2021"
 repository = "https://github.com/erik404/binance_connect/tree/v1.0.0"
 rust-version = "1.63.0"
