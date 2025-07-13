@@ -67,7 +67,7 @@ pub fn client(
                     };
                     // Respond to Ping with Pong to keep the connection alive.
                     socket.send(Message::Pong(ping))?;
-                    debug!("Pong");
+                    debug!("pong");
                 }
                 _ => {}
             },
@@ -83,7 +83,7 @@ pub fn client(
                         Err(BinanceConnectError::SocketError(err))?;
                     }
                     // Sleep for the specified time if a WouldBlock error occurs.
-                    info!(
+                    debug!(
                         "futures_usd client thread slept {:?} because of WouldBlock error",
                         would_block_config.time_out
                     );
