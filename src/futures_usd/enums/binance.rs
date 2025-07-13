@@ -94,6 +94,8 @@ pub enum MarginType {
     Isolated,
     #[serde(rename = "crossed")]
     Crossed,
+    #[serde(rename = "cross")]
+    Cross,
 }
 
 impl MarginType {
@@ -101,6 +103,7 @@ impl MarginType {
         match self {
             MarginType::Isolated => "isolated",
             MarginType::Crossed => "crossed",
+            MarginType::Cross => "cross",
         }
     }
 }
